@@ -83,15 +83,23 @@ def main():
                 continue
             thread_id = threads[idx]['thread_id']
             post_page = 1
+            firstview = True
             while True:
-                get_thread_content(thread_id, page=post_page)
-                cmd = input("輸入 n 下一頁，p 上一頁，b 返回討論串列表: ")
+                if firstview:
+                    get_thread_content(thread_id, page=post_page)
+                    firstview = False
+                cmd = input("輸入 n 下一頁，p 上一頁，b 返回討論串列表，share 分享: ")
                 if cmd.lower() == 'n':
                     post_page += 1
+                    get_thread_content(thread_id, page=post_page)
                 elif cmd.lower() == 'p':
                     post_page = max(1, post_page - 1)
+                    get_thread_content(thread_id, page=post_page)
                 elif cmd.lower() == 'b':
                     break
+                elif cmd.lower() == 'share':
+                    url = f"https://lihkg.com/thread/{thread_id}/page/{post_page}"
+                    print(f"Share URL: {url}")
                 else:
                     print("無效指令，請重新輸入。")
         else:
