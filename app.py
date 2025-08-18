@@ -63,14 +63,42 @@ def get_thread_content(thread_id, page=1, order='reply_time'):
 def main():
     categories = get_property()
     cat_id = input("Enter category ID: ")
-    threads = get_thread_list(cat_id)
-    idx = input("\nEnter thread index (e.g. 0): ")
-    try:
-        idx = int(idx)
-        thread_id = threads[idx]['thread_id']
-        get_thread_content(thread_id)
-    except (ValueError, IndexError):
-        print("Invalid index, please try again.")
+    thread_page = 1
+    while True:
+        threads = get_thread_list(cat_id, page=thread_page)
+        idx = input("\n輸入討論串編號 (如 0)，n 下一頁，p 上一頁，q 離開: ")
+        if idx.lower() == 'q':
+            print("Bye!")
+            break
+        elif idx.lower() == 'n':
+            thread_page += 1
+            continue
+        elif idx.lower() == 'p':
+            thread_page = max(1, thread_page - 1)
+            continue
+        elif idx.isdigit():
+            idx = int(idx)
+            if idx < 0 or idx >= len(threads):
+                print("Invalid index, please try again.")
+                continue
+            thread_id = threads[idx]['thread_id']
+            post_page = 1
+            while True:
+                get_thread_content(thread_id, page=post_page)
+                cmd = input("輸入 n 下一頁，p 上一頁，b 返回討論串列表: ")
+                if cmd.lower() == 'n':
+                    post_page += 1
+                elif cmd.lower() == 'p':
+                    post_page = max(1, post_page - 1)
+                elif cmd.lower() == 'b':
+                    break
+                else:
+                    print("無效指令，請重新輸入。")
+        else:
+            print("無效指令，請重新輸入。")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"An error occurred: {e}")
